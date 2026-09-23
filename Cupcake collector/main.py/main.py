@@ -1,0 +1,73 @@
+import pygame
+import random
+
+pygame.init()
+
+Screen = pygame.display.set_mode((1000, 500))
+pygame.display.set_caption("badaba")
+clock = pygame.time.Clock ()
+player = pygame.image.load('player.png').convert_alpha()
+Cupcake = pygame.image.load('Cupcake.png').convert_alpha()
+Cup = []
+for m in range(10):
+    mx = random.randint(50, 900)
+    my = random.randint(50, 450)
+    Cup.append(pygame.Rect(mx, my, 16, 16))
+plect = player.get_rect() 
+Pseed = 2
+Pjump = 100
+velocity_y = 0
+gravity = 1
+plect.x = 150  
+plect.y = 100  
+running = True
+platforms = [
+    pygame.Rect(0, 550, 800, 50),     # Ground floor
+    pygame.Rect(100, 400, 250, 20),   # Left floating platform
+    pygame.Rect(450, 300, 250, 20)    # Right floating platform
+]
+cool =  1000
+Jumpbefore = 0
+color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+while running:
+    Screen.fill((20, 24, 40))
+    for rect in platforms:
+            pygame.draw.rect(Screen, color, rect)
+    velocity_y += gravity
+    plect.y += velocity_y
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    ct = pygame.time.get_ticks()
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        plect.x -= Pseed
+    if keys[pygame.K_RIGHT]:
+        plect.x += Pseed
+    if keys[pygame.K_UP]:
+        if ct - Jumpbefore >= cool:
+          plect.y -= Pjump
+          Jumpbefore = ct
+        
+    if keys[pygame.K_DOWN]:
+        plect.y += Pseed
+    if plect.bottom > 500:
+        plect.bottom = 500
+    if plect.top < 0:
+        plect.top = 0
+    if plect.right > 1000:
+        plect.right = 1000
+    if plect.left < 0:
+        plect.left = 0
+    for platform in platforms:
+     if plect.colliderect(platform):
+        if velocity_y > 0:  # falling down
+            plect.bottom = platform.top
+            velocity_y = 0
+    if plect.bottom == 500: 
+        velocity_y = 0
+    Screen.blit(player, (plect.x,plect.y) )
+    for cup in Cup:
+     Screen.blit(Cupcake, cup)
+    pygame.display.flip()
+    clock.tick(60)
